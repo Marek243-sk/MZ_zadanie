@@ -58,7 +58,7 @@ source venv/bin/activate
 ```
 
 ### To install all required dependencies:  
-Firstly, make sure you have **venv** activated in zour terminal. You shold see **(venv)** infron of your path.
+Firstly, make sure you have **venv** activated in your terminal. You shold see **(venv)** infront of your path.
 ```bash
 pip install -r requirements.txt
 ```
