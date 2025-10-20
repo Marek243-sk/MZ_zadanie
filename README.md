@@ -4,6 +4,11 @@
 
 ```
 DATA
+ ┣ A composite ranking of risk factors for COVID-19 time-to-event data from a Turkish cohort.pdf
+ ┣ A Multi-Machine Learning Consensus Model Based on Clinical Features Reveals That Interleukin-10 Derived from Monocytes Leads to a Poor Prognosis in Pa.pdf
+ ┣ Coronavirus disease 2019 (COVID‑19) survival analysis using deep learning and Cox regression model.pdf
+ ┣ Development and validation of a risk factor-based system to predict short-term survival in adult hospitalized patients with COVID-19 a multicenter, retrospective, cohort study.pdf
+ ┗ Time to recovery of COVID-19 patients and its predictors a retrospective cohort study in HUCSH, Sidama, Ethiopia.pdf
 src
  ┣ app.py
  ┣ constants.py
