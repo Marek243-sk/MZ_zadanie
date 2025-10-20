@@ -1,0 +1,9 @@
+streamlit
+pandas
+matplotlib
+wordcloud
+scikit-learn
+yake
+keybert
+PyMuPDF
+unidecode

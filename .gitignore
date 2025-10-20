@@ -5,12 +5,12 @@ venv/
 .venv/
 
 # Data sources
-DATA/
-*.csv
-*.pdf
-*.txt
-*.xlsx
-*.zip
+# DATA/
+# *.csv
+# *.pdf
+# *.txt
+# *.xlsx
+# *.zip
 
 # Python cache
 __pycache__/
