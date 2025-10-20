@@ -36,6 +36,11 @@ unidecode
 
 ### Setup instructions   
 
+Firstly, clone repository into chosen folder.
+```bash
+git clone https://github.com/Marek243-sk/MZ_zadanie
+```
+
 It is recommended to use a **virtual environment** to isolate dependencies.  
 To create and activate one, open your terminal in the project folder and type:  
 
