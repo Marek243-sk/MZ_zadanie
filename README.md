@@ -6,6 +6,7 @@
 DATA
 src
  ┣ app.py
+ ┣ constants.py
  ┣ extraction.py
  ┣ loaders.py
  ┣ preprocessing.py
