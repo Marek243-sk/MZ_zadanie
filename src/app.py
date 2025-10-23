@@ -1,12 +1,11 @@
 import os
 import streamlit as st
-import pandas as pd
-
 from loaders import read_pdf, read_txt
 from preprocessing import preprocess_text
 from extraction import extract_yake, extract_tfidf, extract_keybert
 from visualization import plot_bar_chart, plot_wordcloud
 from utils import export_csv
+from constants import GENERAL, TFIDF, YAKE, KEYBERT
 
 # Streamlit setup
 st.set_page_config(page_title="Keywords Extraction", layout="wide")
@@ -46,33 +45,79 @@ else:
             for f in selected_files:
                 uploaded_files.append(os.path.join(data_path, f))
 
-# Keyword extraction settings
-METHODS = ["TF-IDF", "YAKE", "KeyBERT"]
-MIN_VAL = 1
-MAX_VAL = 100
-DEFAULT_VAL = 10
 
-method = st.selectbox("Choose Extraction Method:", METHODS)
-top_n = st.number_input("Number of Keywords:", min_value=MIN_VAL, max_value=MAX_VAL, value=DEFAULT_VAL)
+method = st.selectbox("Choose Extraction Method:", GENERAL.METHODS)
+top_n = st.number_input("Number of Keywords:", min_value=GENERAL.MIN_VAL, max_value=GENERAL.MAX_VAL, value=GENERAL.DEFAULT_VAL)
 
 # Additional method-specific parameters
 if method == "TF-IDF":
-    max_features = st.number_input("TF-IDF max features:", min_value=100, max_value=10000, value=5000, step=100)
-    ngram_min = st.number_input("TF-IDF ngram min:", min_value=1, max_value=3, value=1)
-    ngram_max = st.number_input("TF-IDF ngram max:", min_value=1, max_value=3, value=2)
+    max_features = st.number_input(
+        label="TF-IDF max features:",
+        min_value=TFIDF.MAX_FEATURES_MIN_VALUE,
+        max_value=TFIDF.MAX_FEATURES_MAX_VALUE,
+        value=TFIDF.MAX_FEATURES_VALUE,
+        step=TFIDF.MAX_FEATURES_STEP
+        )
+    ngram_min = st.number_input(
+        label="TF-IDF ngram min:",
+        min_value=TFIDF.NGRAM_MIN_MIN_VALUE,
+        max_value=TFIDF.NGRAM_MIN_MAX_VALUE,
+        value=TFIDF.NGRAM_MIN_VALUE
+        )
+    ngram_max = st.number_input(
+        label="TF-IDF ngram max:",
+        min_value=TFIDF.NGRAM_MAX_MIN_VALUE,
+        max_value=TFIDF.NGRAM_MAX_MAX_VALUE,
+        value=TFIDF.NGRAM_MAX_VALUE
+        )
     ngram_range = (ngram_min, ngram_max)
 
 elif method == "YAKE":
-    ngram_range = st.number_input("YAKE n-gram:", min_value=1, max_value=3, value=2)
-    dedup_threshold = st.number_input("YAKE deduplication threshold:", min_value=0.0, max_value=1.0, value=0.9, step=0.05)
-    window_size = st.number_input("YAKE window size:", min_value=1, max_value=5, value=2)
+    ngram_range = st.number_input(
+        label="YAKE n-gram:",
+        min_value=YAKE.NGRAM_MIN_VALUE,
+        max_value=YAKE.NGRAM_MAX_VALUE,
+        value=YAKE.NGRAM_VALUE
+        )
+    dedup_threshold = st.number_input(
+        label="YAKE deduplication threshold:",
+        min_value=YAKE.DEDUP_MIN_VALUE,
+        max_value=YAKE.DEDUP_MAX_VALUE,
+        value=YAKE.DEDUP_VALUE,
+        step=YAKE.DEDUP_STEP
+        )
+    window_size = st.number_input(
+        label="YAKE window size:",
+        min_value=YAKE.WINDOW_MIN_VALUE,
+        max_value=YAKE.WINDOW_MAX_VALUE,
+        value=YAKE.WINDOW_VALUE
+        )
 
 elif method == "KeyBERT":
-    keyphrase_min = st.number_input("KeyBERT ngram min:", min_value=1, max_value=3, value=1)
-    keyphrase_max = st.number_input("KeyBERT ngram max:", min_value=1, max_value=3, value=2)
+    keyphrase_min = st.number_input(
+        label="KeyBERT ngram min:",
+        min_value=KEYBERT.KEY_MIN_MIN_VALUE,
+        max_value=KEYBERT.KEY_MIN_MAX_VALUE,
+        value=KEYBERT.KEY_MIN_VALUE
+        )
+    keyphrase_max = st.number_input(
+        label="KeyBERT ngram max:",
+        min_value=KEYBERT.KEY_MAX_MIN_VALUE,
+        max_value=KEYBERT.KEY_MAX_MAX_VALUE,
+        value=KEYBERT.KEY_MAX_VALUE
+        )
     keyphrase_range = (keyphrase_min, keyphrase_max)
-    use_mmr = st.checkbox("Use Maximal Marginal Relevance (MMR)?", value=False)
-    diversity = st.number_input("Diversity (if MMR used):", min_value=0.0, max_value=1.0, value=0.5, step=0.05)
+    use_mmr = st.checkbox(
+        label="Use Maximal Marginal Relevance (MMR)?",
+        value=KEYBERT.USE_MMR
+        )
+    diversity = st.number_input(
+        label="Diversity (if MMR used):",
+        min_value=KEYBERT.DIV_MIN_VALUE,
+        max_value=KEYBERT.DIV_MAX_VALUE,
+        value=KEYBERT.DIV_VALUE,
+        step=KEYBERT.DIV_STEP
+        )
 
 # Main process
 if uploaded_files:
@@ -101,12 +146,23 @@ if uploaded_files:
 
         # Extraction with method-specific parameters
         if method == "YAKE":
-            keywords = extract_yake(text, top_n=top_n, n=ngram_range, dedup_threshold=dedup_threshold, window_size=window_size)
+            keywords = extract_yake(
+                text=text,
+                top_n=top_n,
+                n=ngram_range,
+                dedup_threshold=dedup_threshold,
+                window_size=window_size
+                )
         elif method == "TF-IDF":
-            keywords = extract_tfidf([text], top_n=top_n, max_features=max_features, ngram_range=ngram_range)
+            keywords = extract_tfidf(
+                docs=[text],
+                top_n=top_n,
+                max_features=max_features,
+                ngram_range=ngram_range
+                )
         elif method == "KeyBERT":
             keywords = extract_keybert(
-                text,
+                text=text,
                 top_n=top_n,
                 keyphrase_ngram_range=keyphrase_range,
                 use_mmr=use_mmr,

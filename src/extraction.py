@@ -4,13 +4,6 @@ import yake
 from keybert import KeyBERT
 from constants import GENERAL, TFIDF, YAKE, KEYBERT
 
-# Default parameters
-TOP_N = 10
-LANGUAGE = "en"
-STOPWORDS = "english"
-YAKE_N = 2
-DEDUP_THRESHOLD = 0.9
-WINDOW_SIZE = 2
 
 def extract_tfidf(
         docs,
@@ -24,7 +17,7 @@ def extract_tfidf(
     feature_array = vectorizer.get_feature_names_out()
     tfidf_sorting = x.toarray().sum(axis=0).argsort()[::-1]
     keywords = [(feature_array[i], x.toarray().sum(axis=0)[i]) for i in tfidf_sorting[:top_n]]
-    return pd.DataFrame(keywords, columns=["Keyword", "Score"])
+    return pd.DataFrame(keywords, columns=GENERAL.COLUMNS)
 
 
 def extract_yake(
@@ -38,9 +31,9 @@ def extract_yake(
 
     kw_extractor = yake.KeywordExtractor(lan=language, n=n, top=top_n,
                                          dedupLim=dedup_threshold, windowsSize=window_size,
-                                         stop_words=STOPWORDS)
+                                         stop_words=GENERAL.STOPWORDS)
     keywords = kw_extractor.extract_keywords(text)
-    return pd.DataFrame(keywords, columns=["Keyword", "Score"])
+    return pd.DataFrame(keywords, GENERAL.COLUMNS)
 
 
 def extract_keybert(
@@ -69,4 +62,4 @@ def extract_keybert(
             stop_words="english",
             top_n=top_n
         )
-    return pd.DataFrame(keywords, columns=["Keyword", "Score"])
+    return pd.DataFrame(keywords, GENERAL.COLUMNS)
