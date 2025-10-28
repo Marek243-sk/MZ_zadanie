@@ -13,6 +13,16 @@ DATA
  ┣ documentation.pdf
  ┣ documentation.tex
  ┗ references.bib
+ images
+ ┣ keybert_barh.png
+ ┣ keybert_table.png
+ ┣ keybert_wordcloud.png
+ ┣ tfidf_barh.png
+ ┣ tfidf_table.png
+ ┣ tfidf_wordcloud.png
+ ┣ yake_barh.png
+ ┣ yake_table.png
+ ┗ yake_wordcloud.png
 src
  ┣ app.py
  ┣ constants.py
