@@ -14,3 +14,17 @@ venv/
 
 # Python cache
 __pycache__/
+
+res/
+
+# LaTeX
+*.aux
+*.bbl
+*.bcf
+*.blg
+*.fdb_latexmk
+*.fls
+*.log
+*.xml
+*.gz
+*.toc
