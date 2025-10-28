@@ -9,6 +9,10 @@ DATA
  ┣ Coronavirus disease 2019 (COVID‑19) survival analysis using deep learning and Cox regression model.pdf
  ┣ Development and validation of a risk factor-based system to predict short-term survival in adult hospitalized patients with COVID-19 a multicenter, retrospective, cohort study.pdf
  ┗ Time to recovery of COVID-19 patients and its predictors a retrospective cohort study in HUCSH, Sidama, Ethiopia.pdf
+ docs
+ ┣ documentation.pdf
+ ┣ documentation.tex
+ ┗ references.bib
 src
  ┣ app.py
  ┣ constants.py
