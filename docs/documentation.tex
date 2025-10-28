@@ -14,6 +14,8 @@
 \usepackage{caption}
 \usepackage{geometry}
 \geometry{margin=2.5cm}
+\usepackage{float}
+\usepackage{subcaption} 
 
 % --- Citácie ---
 \addbibresource{references.bib}
@@ -54,6 +56,7 @@
 % ===============================
 \tableofcontents
 \newpage
+\setcounter{tocdepth}{2}
 
 % ===============================
 % TEXT PRÁCE
@@ -93,7 +96,7 @@ V oblasti vyhľadávania informácií (Information Retrieval - IR) existujú tri
 
 Tradičné korpusovo orientované metódy, ako napríklad \textbf{Dunningov Log-Likelihood Test (LLT)}, patria medzi najstaršie prístupy ku kľúčovosti slov \cite{dunning1993accurate}. LLT hodnotí štatistickú významnosť rozdielov vo frekvencii slov medzi cieľovým a referenčným korpusom. Slová s výrazne vyššou frekvenciou v cieľovom korpuse sú považované za kľúčové. Nevýhodou LLT je jeho závislosť od kvality referenčného korpusu a neschopnosť pracovať s významovou redundanciou.
 
-Naopak, metóda \textbf{Term Frequency–Inverse Document Frequency (TF-IDF)} \cite{salton1988term} je jednou z najpoužívanejších techník v NLP. Hodnotí dôležitosť termu na základe jeho relatívnej frekvencie v rámci dokumentu a zriedkavosti v celom korpuse. TF-IDF umožňuje jednoduché, ale účinné určenie relevantných termov bez potreby referenčného korpusu. Využíva sa nielen v extrakcii kľúčových slov, ale aj vo vyhľadávačoch, odporúčacích systémoch či textovej klasifikácii.
+Naopak, metóda \textbf{Term Frequency-Inverse Document Frequency (TF-IDF)} \cite{salton1988term} je jednou z najpoužívanejších techník v NLP. Hodnotí dôležitosť termu na základe jeho relatívnej frekvencie v rámci dokumentu a zriedkavosti v celom korpuse. TF-IDF umožňuje jednoduché, ale účinné určenie relevantných termov bez potreby referenčného korpusu. Využíva sa nielen v extrakcii kľúčových slov, ale aj vo vyhľadávačoch, odporúčacích systémoch či textovej klasifikácii.
 
 Štúdia \cite{rose2011tfidf} navrhuje vylepšenú verziu TF-IDF, ktorá zohľadňuje distribúciu slov naprieč dokumentmi a filtruje gramatické slová s nízkou informačnou hodnotou. Táto metóda využíva vnútorné štatistiky korpusu a eliminuje potrebu externých dát, čím sa zvyšuje jej prenositeľnosť a univerzálnosť.
 
@@ -113,17 +116,120 @@ V oblasti sumarizácie a odpovedania na otázky (Question Answering) sa objavuj�
 
 Klasické metódy (LLT, TF-IDF) sú výpočtovo jednoduché a interpretovateľné, no často ignorujú významové súvislosti. Na druhej strane, moderné vektorové a transformátorové prístupy umožňujú modelom pochopiť kontext a význam slov, ale vyžadujú veľké množstvo dát a výpočtových zdrojov. V praxi sa preto často používajú \textbf{hybridné riešenia}, ktoré kombinujú štatistické váhovanie s vektorovou reprezentáciou textu, čím sa dosahuje kompromis medzi efektivitou a presnosťou extrakcie.
 
-
-
 \section{Návrh metódy a výber testovacích dát}
-% (4 body)
+
+Cieľom navrhovanej metódy je umožniť flexibilnú a modulárnu extrakciu kľúčových slov z textových dokumentov rôznych typov, ako sú PDF alebo TXT súbory. Metóda kombinuje tri prístupy: TF-IDF, YAKE a KeyBERT, pričom každý z nich poskytuje odlišný spôsob hodnotenia významu termov v dokumente.  
+
+\begin{itemize}
+    \item \textbf{TF-IDF} vyhodnocuje relatívnu dôležitosť termov na základe ich frekvencie v dokumente a zriedkavosti naprieč korpusom.
+    \item \textbf{YAKE} je nezávislý, korpusovo orientovaný algoritmus založený na štatistike n-gramov a váh slov.
+    \item \textbf{KeyBERT} využíva moderné transformátorové modely (BERT), ktoré zachytávajú kontext a význam slov vo vete, vrátane možnosti použitia Maximal Marginal Relevance (MMR) pre diverzifikované kľúčové slová.
+\end{itemize}
+
+Všetky metódy umožňujú upravovať parametre, ako sú počet extrahovaných kľúčových slov, rozsah n-gramov alebo diverzita v KeyBERT, čo umožňuje testovanie na rôznych typoch textov a dopytoch.
+
+Pre testovanie metódy boli použité dva zdroje dát:  
+
+\begin{enumerate}
+    \item \textbf{Vlastné nahrané dokumenty} - používateľ môže nahrať ľubovoľný súbor vo formáte TXT alebo PDF a overiť spracovanie reálnych textových dát.
+    \item \textbf{Vzorky zo zložky DATA/} - pripravené textové súbory s rôznou dĺžkou a obsahom, slúžiace na porovnanie výkonu a presnosti jednotlivých metód.
+\end{enumerate}
+
+Pred spracovaním textu sa vykonáva predspracovanie, ktoré odstraňuje nadbytočné medzery, čísla a špeciálne znaky, čím sa zvyšuje kvalita extrahovaných kľúčových slov.
 
 \section{Experimentovanie a vyhodnotenie}
-% (8 bodov)
+
+Po implementácii metódy boli vykonané experimenty s cieľom porovnať kvalitu a relevantnosť kľúčových slov generovaných rôznymi prístupmi. Pre každý dokument sa extrahovali kľúčové slová pomocou TF-IDF, YAKE a KeyBERT a výsledky sa vizualizovali prostredníctvom barových grafov a wordcloudov.
+
+Hlavné parametre testované počas experimentov boli:  
+\begin{itemize}
+    \item \textbf{Počet kľúčových slov} (top\_n)
+    \item \textbf{Rozsah n-gramov}
+    \item \textbf{Diverzita v KeyBERT} pri použití MMR
+\end{itemize}
+
+% \subsection{TF-IDF}
+
+\begin{figure}[htbp]
+    \centering
+    \begin{subfigure}[b]{0.45\textwidth}
+        \includegraphics[width=\textwidth]{../images/tfidf_table.png}
+        \caption{Tabuľka kľúčových slov TF-IDF}
+        \label{fig:tfidf_table}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.45\textwidth}
+        \includegraphics[width=\textwidth]{../images/tfidf_barh.png}
+        \caption{Barh graf TF-IDF}
+        \label{fig:tfidf_barh}
+    \end{subfigure}
+
+    \vspace{0.5cm}
+
+    \includegraphics[width=0.6\textwidth]{../images/tfidf_wordcloud.png}
+    \caption{Výsledok extrakcie kľúčových slov metódou TF-IDF - tabuľka, barh graf a wordcloud}
+    \label{fig:tfidf}
+\end{figure}
+
+
+% \subsection{YAKE}
+
+\begin{figure}[htbp]
+    \centering
+    \begin{subfigure}{0.45\textwidth}
+        \includegraphics[width=\textwidth]{../images/yake_table.png}
+        \caption{Tabuľka kľúčových slov YAKE}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}{0.45\textwidth}
+        \includegraphics[width=\textwidth]{../images/yake_barh.png}
+        \caption{Barh graf YAKE}
+    \end{subfigure}
+
+    \vspace{0.5cm}
+
+    \includegraphics[width=0.6\textwidth]{../images/yake_wordcloud.png}
+    \caption{Výsledok extrakcie kľúčových slov metódou YAKE}
+    \label{fig:yake}
+\end{figure}
+
+% \subsection{KeyBERT}
+
+\begin{figure}[htbp]
+    \centering
+    \begin{subfigure}{0.45\textwidth}
+        \includegraphics[width=\textwidth]{../images/keybert_table.png}
+        \caption{Tabuľka kľúčových slov KeyBERT}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}{0.45\textwidth}
+        \includegraphics[width=\textwidth]{../images/keybert_barh.png}
+        \caption{Barh graf KeyBERT}
+    \end{subfigure}
+
+    \vspace{0.5cm}
+
+    \includegraphics[width=0.6\textwidth]{../images/keybert_wordcloud.png}
+    \caption{Výsledok extrakcie kľúčových slov metódou KeyBERT}
+    \label{fig:keybert}
+\end{figure}
+
+\subsection{Zhrnutie experimentov}
+
+\begin{itemize}
+    \item TF-IDF je rýchly a účinný pre kratšie dokumenty s jasne definovanými termami.
+    \item YAKE eliminuje bežné stopwords a irelevantné výrazy.
+    \item KeyBERT poskytuje najlepší kontextový opis, hlavne pri viacslovných termoch; MMR zvyšuje diverzitu výsledkov.
+\end{itemize}
+
+\noindent
+Kombinácia týchto metód poskytuje robustný nástroj na extrakciu kľúčových slov a umožňuje prispôsobiť parametre podľa typu a dĺžky dokumentu.
 
 % ===============================
 % BIBLIOGRAFIA
 % ===============================
-\printbibliography
+\clearpage
+\printbibliography[heading=bibnumbered]
+
 
 \end{document}

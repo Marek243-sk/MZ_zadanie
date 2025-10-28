@@ -28,3 +28,4 @@ res/
 *.xml
 *.gz
 *.toc
+*.synctex(busy)

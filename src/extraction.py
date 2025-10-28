@@ -12,12 +12,12 @@ def extract_tfidf(
         ngram_range: tuple = TFIDF.NGRAM_RANGE
         ) -> pd.DataFrame:
 
-    vectorizer = TfidfVectorizer(max_features=max_features, ngram_range=ngram_range, stop_words="english")
+    vectorizer = TfidfVectorizer(max_features=max_features, ngram_range=ngram_range, stop_words=TFIDF.STOPWORDS)
     x = vectorizer.fit_transform(docs)
     feature_array = vectorizer.get_feature_names_out()
     tfidf_sorting = x.toarray().sum(axis=0).argsort()[::-1]
     keywords = [(feature_array[i], x.toarray().sum(axis=0)[i]) for i in tfidf_sorting[:top_n]]
-    return pd.DataFrame(keywords, columns=GENERAL.COLUMNS)
+    return pd.DataFrame(keywords, columns=GENERAL.COLUMNS).sort_values(by="Score", ascending=False).reset_index(drop=True)
 
 
 def extract_yake(
@@ -33,7 +33,7 @@ def extract_yake(
                                          dedupLim=dedup_threshold, windowsSize=window_size,
                                          stop_words=GENERAL.STOPWORDS)
     keywords = kw_extractor.extract_keywords(text)
-    return pd.DataFrame(keywords, GENERAL.COLUMNS)
+    return pd.DataFrame(keywords, columns=GENERAL.COLUMNS).sort_values(by="Score", ascending=False).reset_index(drop=True)
 
 
 def extract_keybert(
@@ -62,4 +62,4 @@ def extract_keybert(
             stop_words="english",
             top_n=top_n
         )
-    return pd.DataFrame(keywords, GENERAL.COLUMNS)
+    return pd.DataFrame(keywords, columns=GENERAL.COLUMNS).sort_values(by="Score", ascending=False).reset_index(drop=True)

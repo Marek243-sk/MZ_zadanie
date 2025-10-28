@@ -6,7 +6,8 @@ class GENERAL:
         "a", "the", "and", "but", "or", "so", "to", "of", "this", "that", "them",
         "than", "in", "up", "for", "as", "et", "al", "is", "by", "on", "are", "am"
         "I", "you", "we", "tey", "he", "she", "it", "their", "theirs", "et", "al",
-        "use", "uses", "using", "an"
+        "use", "uses", "using", "an", "from", "with", "be", "not", "our", "used", "can",
+        "could", "would", "will", "were", "was"
         ]
     METHODS = ["TF-IDF", "YAKE", "KeyBERT"]
     MIN_VAL = 1
@@ -28,6 +29,7 @@ class TFIDF:
     NGRAM_MAX_MIN_VALUE = 1
     NGRAM_MAX_MAX_VALUE = 3
     NGRAM_MAX_VALUE = 1
+    STOPWORDS = GENERAL.STOPWORDS
 
 
 class YAKE:
