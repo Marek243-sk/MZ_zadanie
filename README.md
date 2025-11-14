@@ -64,7 +64,7 @@ python -m venv MZ_zadanie/venv
 ```
 To activate venv, if it already isn't, run in terminal:  
 ```bash
-venv\Scripts\activate.ps1
+MZ_zadanie\venv\Scripts\activate.ps1
 ```
 
 #### On macOS / Linux:  
