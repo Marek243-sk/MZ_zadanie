@@ -84,7 +84,7 @@ pip install -r MZ_zadanie/requirements.txt
 
 ### Running the app  
 ```bash
-streamlit run src/app.py
+streamlit run MZ_zadanie/src/app.py
 ```
 ---
 # About this project  
