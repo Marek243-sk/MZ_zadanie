@@ -79,7 +79,7 @@ source venv/bin/activate
 ### To install all required dependencies:  
 Firstly, make sure you have **venv** activated in your terminal. You shold see **(venv)** infront of your path.
 ```bash
-pip install -r requirements.txt
+pip install -r MZ_zadanie/requirements.txt
 ```
 
 ### Running the app  
