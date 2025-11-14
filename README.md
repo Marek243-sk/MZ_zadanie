@@ -60,7 +60,7 @@ To create and activate one, open your terminal in the project folder and type:
 
 #### On Windows:  
 ```bash
-python -m venv venv
+python -m venv MZ_zadanie/venv
 ```
 To activate venv, if it already isn't, run in terminal:  
 ```bash
