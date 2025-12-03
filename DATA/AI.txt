@@ -1,0 +1,26 @@
+Artificial intelligence (AI) represents one of the most significant technological revolutions of the modern world.
+It is a branch of computer science focused on creating systems capable of performing tasks that traditionally require human
+intelligence. These tasks include image and speech recognition, decision-making, planning, learning, and natural language processing.
+AI is used across a wide range of fields, from industry and medicine to everyday life, and its impact on society is enormous.
+Historically, the development of AI began in the 1950s, when scientists such as Alan Turing and John McCarthy started exploring
+the concept of machines that could “think.” Early AI systems focused on solving specific problems using symbolic information
+processing and rules. These systems are referred to as narrow AI, or “weak AI,” because they are designed for particular tasks and
+do not possess general human-like intelligence. Modern AI increasingly relies on machine learning and deep learning techniques.
+Machine learning allows systems to “learn” from experience and data, where algorithms analyze large amounts of information and generate
+predictions or decisions based on it. Deep learning uses neural networks with multiple layers that can process complex and
+unstructured data, such as images, sounds, or text. Thanks to these methods, modern AI systems can achieve performance that, in certain
+domains, surpasses human abilities.One of the most prominent areas where AI demonstrates its potential is medicine.
+Algorithms can analyze medical images, identify diseases at early stages, and recommend appropriate treatments. In transportation,
+AI is applied to autonomous vehicles, analyzing traffic and preventing accidents. In business and marketing, AI enables personalized 
+ecommendations and predicts customer behavior. In research and science, AI becomes an invaluable tool for analyzing large datasets,
+modeling complex processes, and discovering new insights.Despite all these advantages, AI also raises several challenges and concerns.
+One major issue is ethics and responsibility. How can we ensure that algorithmic decisions are fair and free from bias? Another
+concern is data privacy and security, as modern AI systems require large amounts of personal information. There are also worries
+about automation and potential job displacement in certain industries. Therefore, it is crucial that AI development is guided by
+ethical standards, regulation, and continuous oversight. The future of artificial intelligence is both fascinating and open to endless
+possibilities. The development of artificial general intelligence (AGI), which would have human-like abilities across multiple domains,
+is anticipated. AI will increasingly integrate into everyday life, not only as a tool but also as a partner in solving complex problems,
+creating innovative projects, and supporting decision-making. Ultimately, artificial intelligence represents not only a technological
+but also a philosophical challenge. How will we handle tools that can think, learn, and make decisions? How can we ensure that its use
+benefits society as a whole? The answers to these questions will shape how humans live, work, and communicate in an era fundamentally
+influenced by AI.

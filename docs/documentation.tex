@@ -1,13 +1,13 @@
 \documentclass[a4paper,12pt]{article}
 
-% --- Slovenské prostredie ---
 \usepackage[slovak]{babel}
+\usepackage{microtype}
+\sloppy
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage{csquotes}
-\usepackage[backend=biber,style=numeric,language=english]{biblatex}
+\usepackage[backend=biber,style=numeric,language=slovak]{biblatex}
 
-% --- Grafika, tabuľky, formátovanie ---
 \usepackage{graphicx}
 \usepackage{amsmath}
 \usepackage{booktabs}
@@ -17,18 +17,14 @@
 \usepackage{float}
 \usepackage{subcaption} 
 
-% --- Citácie ---
 \addbibresource{references.bib}
 
-% --- Odseky ---
 \setlength{\parskip}{0.5em}
 \setlength{\parindent}{0pt}
 
 \begin{document}
 
-% ===============================
 % TITULNÁ STRANA
-% ===============================
 \begin{titlepage}
     \centering
     {\Large \textbf{Technická univerzita v Košiciach}}\\[0.3em]
@@ -50,23 +46,18 @@
     \end{flushright}
 \end{titlepage}
 
-
-% ===============================
 % OBSAH
-% ===============================
 \tableofcontents
 \newpage
 \setcounter{tocdepth}{2}
 
-% ===============================
-% TEXT PRÁCE
-% ===============================
+% TEXT
 
 \section{Popis problému}
 
 V súčasnosti dochádza k neustálemu rastu objemu digitálnych dát vo forme textových dokumentov, vedeckých článkov, správ, e-mailov či príspevkov na sociálnych sieťach. Táto expanzia textových dát vyvoláva potrebu efektívnych metód na ich automatizované spracovanie, analýzu a porozumenie obsahu. Jednou z kľúčových úloh v oblasti spracovania prirodzeného jazyka (Natural Language Processing - NLP) a dolovania textu (Text Mining) je extrakcia kľúčových slov (Keyword Extraction - KE). 
 
-Cieľom extrakcie kľúčových slov je identifikovať tie termíny, ktoré najlepšie vystihujú obsah a tému daného dokumentu. Kľúčové slová majú zásadný význam pri úlohách, ako sú sumarizácia textu, klasifikácia dokumentov, vyhľadávanie informácií či automatické značkovanie obsahu \cite{rose2010automatic}. Automatizovaná extrakcia kľúčových slov zároveň znižuje časovú náročnosť manuálneho anotovania a umožňuje spracovávať rozsiahle textové korpusy bez zásahu človeka.
+Cieľom extrakcie kľúčových slov je identifikovať tie termíny, ktoré najlepšie vystihujú obsah a tému daného dokumentu. Kľúčové slová majú zásadný význam pri úlohách, ako sú sumarizácia textu, klasifikácia dokumentov, vyhľadávanie informácií či automatické značkovanie obsahu \cite{rose2010automatic}. Automatizovaná extrakcia kľúčových slov zároveň znižuje časovú náročnosť manuálneho anotovania a umožňuje spracovávať rozsiahle textové súbory bez zásahu človeka.
 
 Podľa štúdie \cite{rose2010automatic} sú hlavné výzvy v tejto oblasti spojené s presnosťou a spoľahlivosťou extrakcie. Tradičné štatistické prístupy (napr. Log-Likelihood Test - LLT) často vykazujú závislosť od referenčných korpusov, čím sa znižuje ich robustnosť. Problémom býva aj nedostatočné filtrovanie neplnovýznamových slov, ako sú predložky či spojky, ktoré dosahujú vysokú frekvenciu, no nenesú významovú hodnotu.
 
@@ -94,27 +85,25 @@ V oblasti vyhľadávania informácií (Information Retrieval - IR) existujú tri
 
 \subsection{Štatistické metódy - LLT a TF-IDF}
 
-Tradičné korpusovo orientované metódy, ako napríklad \textbf{Dunningov Log-Likelihood Test (LLT)}, patria medzi najstaršie prístupy ku kľúčovosti slov \cite{dunning1993accurate}. LLT hodnotí štatistickú významnosť rozdielov vo frekvencii slov medzi cieľovým a referenčným korpusom. Slová s výrazne vyššou frekvenciou v cieľovom korpuse sú považované za kľúčové. Nevýhodou LLT je jeho závislosť od kvality referenčného korpusu a neschopnosť pracovať s významovou redundanciou.
+Tradičné korpusovo orientované metódy, ako napríklad \textbf{Dunningov Log-Likelihood Test (LLT)}, patria medzi najstaršie prístupy k extrakcii kľúčových slov. \cite{dunning1993accurate}. LLT hodnotí štatistickú významnosť rozdielov vo frekvencii slov medzi cieľovým a referenčným korpusom. Slová s výrazne vyššou frekvenciou v cieľovom korpuse sú považované za kľúčové. Nevýhodou LLT je jeho závislosť od kvality referenčného korpusu a neschopnosť pracovať s významovou redundanciou.
 
 Naopak, metóda \textbf{Term Frequency-Inverse Document Frequency (TF-IDF)} \cite{salton1988term} je jednou z najpoužívanejších techník v NLP. Hodnotí dôležitosť termu na základe jeho relatívnej frekvencie v rámci dokumentu a zriedkavosti v celom korpuse. TF-IDF umožňuje jednoduché, ale účinné určenie relevantných termov bez potreby referenčného korpusu. Využíva sa nielen v extrakcii kľúčových slov, ale aj vo vyhľadávačoch, odporúčacích systémoch či textovej klasifikácii.
 
-Štúdia \cite{rose2011tfidf} navrhuje vylepšenú verziu TF-IDF, ktorá zohľadňuje distribúciu slov naprieč dokumentmi a filtruje gramatické slová s nízkou informačnou hodnotou. Táto metóda využíva vnútorné štatistiky korpusu a eliminuje potrebu externých dát, čím sa zvyšuje jej prenositeľnosť a univerzálnosť.
-
 \subsection{Latentné sémantické a vektorové modely}
 
-Moderné NLP techniky rozširujú pôvodné frekvenčné metódy o sémantické chápanie textu. \textbf{Latentné sémantické indexovanie (LSI)} využíva singulárnu dekompozíciu matíc (SVD) na zistenie skrytých významových vzťahov medzi slovami a dokumentmi \cite{deerwester1990indexing}. Umožňuje redukciu dimenzie a potláča problémy synonymie a polysémie, ktoré sú typické pre prirodzený jazyk.
+Moderné NLP techniky rozširujú pôvodné frekvenčné metódy o sémantické chápanie textu. \textbf{Latentné sémantické indexovanie (LSI)} využíva singulárnu dekompozíciu matíc (SVD) na zistenie skrytých významových vzťahov medzi slovami a dokumentmi \cite{deerwester1990indexing}. Umožňuje redukciu dimenzie a zmierňuje problémy s viacnásobným významom slov a podobnosťou výrazov v prirodzenom jazyku.
 
 Ďalším krokom boli modely založené na distribučných reprezentáciách, ako \textbf{Word2Vec}, \textbf{GloVe} a neskôr \textbf{BERT}, ktoré umožňujú zachytiť význam slov na základe ich kontextu. Takéto modely sú základom moderných extrakčných nástrojov, ako napríklad \textbf{KeyBERT}, ktorý využíva vektorové reprezentácie a kosínusovú podobnosť na určenie najrelevantnejších kľúčových slov v texte \cite{grootendorst2020keybert}.
 
-\subsection{Transformátorové a hybridné metódy}
+\subsection{Transformerové a hybridné metódy}
 
-Najnovšie prístupy v oblasti extrakcie kľúčových slov využívajú \textbf{transformátorové architektúry} (napr. BERT, T5, PEGASUS), ktoré umožňujú pochopiť kontext textu na hlbšej úrovni \cite{devlin2019bert, lewis2020bart, zhang2020pegasus}. Tieto modely dokážu kombinovať informácie o sémantike, gramatike aj pragmatike jazyka a sú vhodné pre úlohy, kde je dôležité pochopiť zámer a význam celého dokumentu.
+Najnovšie prístupy v oblasti extrakcie kľúčových slov využívajú \textbf{transformerové architektúry} (napr. BERT, T5, PEGASUS), ktoré umožňujú pochopiť kontext textu na hlbšej úrovni \cite{devlin2019bert, lewis2020bart, zhang2020pegasus}. Tieto modely dokážu kombinovať informácie o sémantike, gramatike aj vlastnostiach programovacích jazykov a sú vhodné pre úlohy, kde je dôležité pochopiť zámer a význam celého dokumentu.
 
 V oblasti sumarizácie a odpovedania na otázky (Question Answering) sa objavujú metódy, ktoré využívajú extrahované kľúčové slová na navádzanie modelu počas generovania sumarizovaného textu \cite{grootendorst2020keybert}. Takéto prístupy spájajú extrakciu a generáciu a predstavujú prechod k hybridným systémom schopným integrovať viaceré NLP techniky.
 
 \subsection{Zhrnutie}
 
-Klasické metódy (LLT, TF-IDF) sú výpočtovo jednoduché a interpretovateľné, no často ignorujú významové súvislosti. Na druhej strane, moderné vektorové a transformátorové prístupy umožňujú modelom pochopiť kontext a význam slov, ale vyžadujú veľké množstvo dát a výpočtových zdrojov. V praxi sa preto často používajú \textbf{hybridné riešenia}, ktoré kombinujú štatistické váhovanie s vektorovou reprezentáciou textu, čím sa dosahuje kompromis medzi efektivitou a presnosťou extrakcie.
+Klasické metódy (LLT, TF-IDF) sú výpočtovo jednoduché a interpretovateľné, no často ignorujú významové súvislosti. Na druhej strane, moderné vektorové a transformerové prístupy umožňujú modelom pochopiť kontext a význam slov, ale vyžadujú veľké množstvo dát a výpočtových zdrojov. V praxi sa preto často používajú \textbf{hybridné riešenia}, ktoré kombinujú štatistické váhovanie s vektorovou reprezentáciou textu, čím sa dosahuje kompromis medzi efektivitou a presnosťou extrakcie.
 
 \section{Návrh metódy a výber testovacích dát}
 
@@ -123,7 +112,7 @@ Cieľom navrhovanej metódy je umožniť flexibilnú a modulárnu extrakciu kľ�
 \begin{itemize}
     \item \textbf{TF-IDF} vyhodnocuje relatívnu dôležitosť termov na základe ich frekvencie v dokumente a zriedkavosti naprieč korpusom.
     \item \textbf{YAKE} je nezávislý, korpusovo orientovaný algoritmus založený na štatistike n-gramov a váh slov.
-    \item \textbf{KeyBERT} využíva moderné transformátorové modely (BERT), ktoré zachytávajú kontext a význam slov vo vete, vrátane možnosti použitia Maximal Marginal Relevance (MMR) pre diverzifikované kľúčové slová.
+    \item \textbf{KeyBERT} využíva moderné transformerové modely (BERT), ktoré zachytávajú kontext a význam slov vo vete, vrátane možnosti použitia Maximal Marginal Relevance (MMR) pre diverzifikované kľúčové slová.
 \end{itemize}
 
 Všetky metódy umožňujú upravovať parametre, ako sú počet extrahovaných kľúčových slov, rozsah n-gramov alebo diverzita v KeyBERT, čo umožňuje testovanie na rôznych typoch textov a dopytoch.
@@ -225,11 +214,8 @@ Hlavné parametre testované počas experimentov boli:
 \noindent
 Kombinácia týchto metód poskytuje robustný nástroj na extrakciu kľúčových slov a umožňuje prispôsobiť parametre podľa typu a dĺžky dokumentu.
 
-% ===============================
 % BIBLIOGRAFIA
-% ===============================
+
 \clearpage
 \printbibliography[heading=bibnumbered]
-
-
 \end{document}

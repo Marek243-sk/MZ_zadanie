@@ -1,8 +1,21 @@
-import fitz
+"""
+Module for data loaders
+"""
+
 import re
+import fitz
 from unidecode import unidecode
 
-def read_pdf(file, filetype: str = "pdf"):
+
+def read_pdf(file, filetype: str = "pdf") -> str:
+    """
+    Reads pdf file
+    Args:
+        file: file to extract data from
+        filetype(str): type of file - pdf
+    Returns:
+        text(str): extracted text data from given file
+    """
     if isinstance(file, bytes):
         doc = fitz.open(stream=file, filetype=filetype)
     elif isinstance(file, str):
@@ -18,6 +31,13 @@ def read_pdf(file, filetype: str = "pdf"):
 
 
 def read_txt(file):
+    """
+    Reads txt file
+    Args:
+        file: file to extract data from
+    Returns:
+        text(str): extracted text data from given file
+    """
     if isinstance(file, bytes):
         text = file.decode("utf-8")
     elif isinstance(file, str):

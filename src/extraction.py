@@ -1,65 +1,163 @@
+"""
+Module for keyword extraction
+"""
+
+from dataclasses import dataclass
+from typing import Tuple
 import pandas as pd
 from sklearn.feature_extraction.text import TfidfVectorizer
 import yake
 from keybert import KeyBERT
-from constants import GENERAL, TFIDF, YAKE, KEYBERT
+from constants import STOPWORDS, COLUMNS, LANGUAGE
+
+
+@dataclass
+class TFIDFConfig:
+    """Class for TF-IDF cinfiguration"""
+
+    top_n: int = 20
+    max_features: int = 10_000
+    ngram_range: Tuple[int, int] = (1, 2)
 
 
 def extract_tfidf(
-        docs,
-        top_n: int = GENERAL.TOP_N,
-        max_features: int = TFIDF.MAX_FEATURES,
-        ngram_range: tuple = TFIDF.NGRAM_RANGE
-        ) -> pd.DataFrame:
+    docs,
+    config: TFIDFConfig,
+) -> pd.DataFrame:
+    """
+    Extract TF-IDF keywords from a collection of documents.
 
-    vectorizer = TfidfVectorizer(max_features=max_features, ngram_range=ngram_range, stop_words=TFIDF.STOPWORDS)
+    Args:
+        docs (Iterable[str]): Input documents.
+        config (TFIDFConfig): Configuration object for TF-IDF extraction.
+
+    Returns:
+        pd.DataFrame: DataFrame containing keywords and their TF-IDF scores.
+    """
+
+    # Convert a collection of raw documents to a matrix of TF-IDF features
+    vectorizer = TfidfVectorizer(
+        max_features=config.max_features,
+        ngram_range=config.ngram_range,
+        stop_words=STOPWORDS,
+    )
+
+    # Fit and transform documents into a TF-IDF matrix
     x = vectorizer.fit_transform(docs)
+
+    # Extract feature names
     feature_array = vectorizer.get_feature_names_out()
-    tfidf_sorting = x.toarray().sum(axis=0).argsort()[::-1]
-    keywords = [(feature_array[i], x.toarray().sum(axis=0)[i]) for i in tfidf_sorting[:top_n]]
-    return pd.DataFrame(keywords, columns=GENERAL.COLUMNS).sort_values(by="Score", ascending=False).reset_index(drop=True)
+
+    # Compute total TF-IDF score for each token
+    tfidf_scores = x.sum(axis=0).A1
+
+    # Sort tokens by score (descending)
+    tfidf_sorting = tfidf_scores.argsort()[::-1]
+
+    # Select top N keywords
+    top_indices = tfidf_sorting[: config.top_n]
+    keywords = [(feature_array[i], tfidf_scores[i]) for i in top_indices]
+
+    return (
+        pd.DataFrame(keywords, columns=COLUMNS)
+        .sort_values(by="Score", ascending=False)
+        .reset_index(drop=True)
+    )
 
 
-def extract_yake(
-        text,
-        top_n: int = GENERAL.TOP_N,
-        n: int = YAKE.N,
-        dedup_threshold: float = YAKE.DEDUP_THRESHOLD,
-        window_size: int = YAKE.WINDOW_SIZE
-        ,language: str = YAKE.LANGUAGE
-        ) -> pd.DataFrame:
+# pylint: disable=too-many-arguments
+# pylint: disable=too-many-positional-arguments
+@dataclass
+class YAKEConfig:
+    """Class for YAKE configuration"""
 
-    kw_extractor = yake.KeywordExtractor(lan=language, n=n, top=top_n,
-                                         dedupLim=dedup_threshold, windowsSize=window_size,
-                                         stop_words=GENERAL.STOPWORDS)
+    top_n: int = 20
+    ngram_size: int = 3
+    dedup_threshold: float = 0.9
+    window_size: int = 1
+    language: str = LANGUAGE
+
+
+# pylint: disable=too-many-arguments
+# pylint: disable=too-many-positional-arguments
+def extract_yake(text: str, config: YAKEConfig) -> pd.DataFrame:
+    """
+    Extract keywords from a text using the YAKE algorithm.
+
+    Args:
+        text (str): Input text.
+        config (YAKEConfig): Configuration object for YAKE extraction.
+
+    Returns:
+        pd.DataFrame: DataFrame with extracted keywords and scores.
+    """
+
+    # Initialize YAKE keyword extractor
+    kw_extractor = yake.KeywordExtractor(
+        lan=config.language,
+        n=config.ngram_size,
+        top=config.top_n,
+        dedupLim=config.dedup_threshold,
+        windowSize=config.window_size,
+        stopwords=STOPWORDS,
+    )
+
+    # Extract keywords from text
     keywords = kw_extractor.extract_keywords(text)
-    return pd.DataFrame(keywords, columns=GENERAL.COLUMNS).sort_values(by="Score", ascending=False).reset_index(drop=True)
+
+    # Convert to DataFrame
+    return (
+        pd.DataFrame(keywords, columns=COLUMNS)
+        .sort_values(by="Score", ascending=False)
+        .reset_index(drop=True)
+    )
+
+
+@dataclass
+class KEYBERTConfig:
+    """Class for KEYBERT configuration"""
+
+    top_n: int = 10
+    keyphrase_ngram_range: Tuple[int, int] = (1, 2)
+    use_mmr: bool = False
+    diversity: float = 0.5
+    model_name: str = "all-MiniLM-L6-v2"
 
 
 def extract_keybert(
-        text,
-        top_n: int = GENERAL.TOP_N,
-        keyphrase_ngram_range: tuple = KEYBERT.NGRAM_RANGE,
-        use_mmr: bool = KEYBERT.USE_MMR,
-        diversity: float = KEYBERT.DIVERSITY,
-        model_name: str = KEYBERT.MODEL_NAME
-        )-> pd.DataFrame:
+    text,
+    config: KEYBERTConfig,
+) -> pd.DataFrame:
+    """
+    Extract keywords from a text using the KEYBERT algorithm.
 
-    kw_model = KeyBERT(model_name)
-    if use_mmr:
+    Args:
+        text (str): Input text.
+        config (KEYBERTConfig): Configuration object for YAKE extraction.
+
+    Returns:
+        pd.DataFrame: DataFrame with extracted keywords and scores.
+    """
+
+    kw_model = KeyBERT(config.model_name)
+    if config.use_mmr:
         keywords = kw_model.extract_keywords(
             text,
-            keyphrase_ngram_range=keyphrase_ngram_range,
+            keyphrase_ngram_range=config.keyphrase_ngram_range,
             stop_words="english",
             use_mmr=True,
-            diversity=diversity,
-            top_n=top_n
+            diversity=config.diversity,
+            top_n=config.top_n,
         )
     else:
         keywords = kw_model.extract_keywords(
             text,
-            keyphrase_ngram_range=keyphrase_ngram_range,
+            keyphrase_ngram_range=config.keyphrase_ngram_range,
             stop_words="english",
-            top_n=top_n
+            top_n=config.top_n,
         )
-    return pd.DataFrame(keywords, columns=GENERAL.COLUMNS).sort_values(by="Score", ascending=False).reset_index(drop=True)
+    return (
+        pd.DataFrame(keywords, columns=COLUMNS)
+        .sort_values(by="Score", ascending=False)
+        .reset_index(drop=True)
+    )
