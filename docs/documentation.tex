@@ -1,13 +1,11 @@
 \documentclass[a4paper,12pt]{article}
 
 \usepackage[slovak]{babel}
-\usepackage{microtype}
-\sloppy
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage{csquotes}
 \usepackage[backend=biber,style=numeric,language=slovak]{biblatex}
-
+\usepackage{microtype}
 \usepackage{graphicx}
 \usepackage{amsmath}
 \usepackage{booktabs}
@@ -16,6 +14,10 @@
 \geometry{margin=2.5cm}
 \usepackage{float}
 \usepackage{subcaption} 
+\usepackage{tikz}
+\usetikzlibrary{positioning, arrows.meta}
+\usepackage{multirow}
+\usepackage{array}
 
 \addbibresource{references.bib}
 
@@ -52,9 +54,7 @@
 \setcounter{tocdepth}{2}
 
 % TEXT
-
 \section{Popis problému}
-
 V súčasnosti dochádza k neustálemu rastu objemu digitálnych dát vo forme textových dokumentov, vedeckých článkov, správ, e-mailov či príspevkov na sociálnych sieťach. Táto expanzia textových dát vyvoláva potrebu efektívnych metód na ich automatizované spracovanie, analýzu a porozumenie obsahu. Jednou z kľúčových úloh v oblasti spracovania prirodzeného jazyka (Natural Language Processing - NLP) a dolovania textu (Text Mining) je extrakcia kľúčových slov (Keyword Extraction - KE). 
 
 Cieľom extrakcie kľúčových slov je identifikovať tie termíny, ktoré najlepšie vystihujú obsah a tému daného dokumentu. Kľúčové slová majú zásadný význam pri úlohách, ako sú sumarizácia textu, klasifikácia dokumentov, vyhľadávanie informácií či automatické značkovanie obsahu \cite{rose2010automatic}. Automatizovaná extrakcia kľúčových slov zároveň znižuje časovú náročnosť manuálneho anotovania a umožňuje spracovávať rozsiahle textové súbory bez zásahu človeka.
@@ -126,81 +126,178 @@ Pre testovanie metódy boli použité dva zdroje dát:
 
 Pred spracovaním textu sa vykonáva predspracovanie, ktoré odstraňuje nadbytočné medzery, čísla a špeciálne znaky, čím sa zvyšuje kvalita extrahovaných kľúčových slov.
 
-\section{Experimentovanie a vyhodnotenie}
+\section{Implementácia a dokumentácia kódu}
 
-Po implementácii metódy boli vykonané experimenty s cieľom porovnať kvalitu a relevantnosť kľúčových slov generovaných rôznymi prístupmi. Pre každý dokument sa extrahovali kľúčové slová pomocou TF-IDF, YAKE a KeyBERT a výsledky sa vizualizovali prostredníctvom barových grafov a wordcloudov.
+V rámci riešenia bola implementovaná modulárna aplikácia v jazyku Python, ktorá umožňuje extrakciu kľúčových slov pomocou troch metód: TF-IDF, YAKE a KeyBERT. Aplikácia bola realizovaná ako interaktívne grafické rozhranie v prostredí \texttt{Streamlit}, čo umožňuje používateľovi jednoducho nahrávať dokumenty, nastavovať parametre jednotlivých metód a vizualizovať výsledky.
 
-Hlavné parametre testované počas experimentov boli:  
+Celá implementácia je rozdelená do viacerých logických modulov, ktoré spolupracujú na spracovaní textu, extrakcii kľúčových slov a vizualizácii výstupov. Takáto štruktúra zvyšuje prehľadnosť, uľahčuje údržbu a umožňuje jednoduché rozšírenie aplikácie o ďalšie metódy extrakcie.
+
+\subsection{Modul \texttt{loaders} – načítavanie dokumentov}
+
+Modul \texttt{loaders} obsahuje funkcie zodpovedné za načítanie a extrakciu textu zo vstupných súborov typu PDF alebo TXT.  
+PDF sú spracovávané pomocou knižnice \texttt{PyMuPDF}, ktorá umožňuje spoľahlivú extrakciu textu z jednotlivých strán dokumentu. Textové súbory (TXT) sú načítané v kódovaní UTF-8 a následne prechádzajú základným čistením, ktoré odstraňuje LaTeX značky či špeciálne znaky.
+
+Hlavné funkcie modulu:
 \begin{itemize}
-    \item \textbf{Počet kľúčových slov} (top\_n)
-    \item \textbf{Rozsah n-gramov}
-    \item \textbf{Diverzita v KeyBERT} pri použití MMR
+    \item \texttt{read\_pdf()}: extrahuje text z PDF dokumentov,
+    \item \texttt{read\_txt()}: načítava text z TXT súborov a vykonáva jeho základnú normalizáciu.
 \end{itemize}
 
-% \subsection{TF-IDF}
+\subsection{Modul \texttt{preprocessing} - predspracovanie textu}
 
-\begin{figure}[htbp]
+V rámci predspracovania je text upravený tak, aby extrakčné metódy pracovali len s relevantnými informáciami. Modul vykonáva tieto operácie:
+\begin{itemize}
+    \item odstránenie duplicít medzier,
+    \item odstránenie numerických znakov,
+    \item základná normalizácia textu.
+\end{itemize}
+
+Predspracovanie zlepšuje kvalitu extrahovaných kľúčových slov, znižuje šum a eliminuje irelevantné symboly.
+
+\subsection{Modul \texttt{extraction} - implementácia TF-IDF, YAKE a KeyBERT}
+
+Najdôležitejšia časť aplikácie je implementovaná v module \texttt{extraction}, ktorý obsahuje:
+\begin{itemize}
+    \item dátové triedy (\texttt{@dataclass}) pre konfiguráciu jednotlivých metód,
+    \item implementáciu troch extrakčných algoritmov.
+\end{itemize}
+
+\subsubsection*{TF-IDF}
+Metóda TF-IDF je implementovaná pomocou knižnice \texttt{scikit-learn}. Používateľ môže nastavovať:
+\begin{itemize}
+    \item počet extrahovaných kľúčových slov,
+    \item počet maximálnych čŕt (\texttt{max\_features}),
+    \item rozsah n-gramov.
+\end{itemize}
+
+Výsledkom je tabuľka najvýznamnejších termov zoradených podľa ich váhy TF-IDF.
+
+\subsubsection*{YAKE}
+YAKE je štatistická metóda, ktorá nevyžaduje žiaden referenčný korpus. V aplikácii je použité nastavenie:
+\begin{itemize}
+    \item veľkosť n-gramu,
+    \item deduplikačný prah,
+    \item veľkosť kontextového okna.
+\end{itemize}
+
+Výstupom je zoznam n-gramov s ich hodnotou významovosti.
+
+\subsubsection*{KeyBERT}
+KeyBERT využíva jazykový model \texttt{all-MiniLM-L6-v2}, ktorý generuje vektorovú reprezentáciu dokumentu aj jednotlivých kandidátnych kľúčových fráz. K nim následne počíta kosínusovú podobnosť.
+
+Používateľ môže aktivovať mechanizmus \textbf{Maximal Marginal Relevance (MMR)}, ktorý balansuje medzi relevanciou a diverzitou. Parametrom \texttt{diversity} je možné riadiť mieru penalizácie podobných kľúčových slov.
+
+\subsection{Modul \texttt{visualization} - vizualizácia výsledkov}
+
+Pre zlepšenie prehľadnosti výsledkov boli implementované dve hlavné vizualizačné metódy:
+\begin{itemize}
+    \item horizontálny barový graf s hodnotami skóre,
+    \item \texttt{wordcloud}, ktorý graficky znázorňuje najčastejšie alebo najrelevantnejšie termy.
+\end{itemize}
+
+Obe vizualizácie sú integrovateľné do prostredia Streamlit a sú doplnené tabuľkovým výstupom.
+
+\subsection{Modul \texttt{utils}  export výsledkov}
+
+Používateľ si môže výsledky extrakcie stiahnuť vo formáte CSV. Modul obsahuje funkciu:
+\begin{itemize}
+    \item \texttt{export\_csv()}, ktorá zlučuje výsledky všetkých dokumentov a generuje súbor s kompletným prehľadom extrahovaných kľúčových slov.
+\end{itemize}
+
+\subsection{Hlavná aplikácia v \texttt{Streamlit}}
+
+Hlavný spúšťací modul integruje všetky komponenty do jedného používateľsky prívetivého rozhrania. Aplikácia umožňuje:
+\begin{itemize}
+    \item výber zdroja dát (upload alebo vzorové súbory),
+    \item konfiguráciu parametrov jednotlivých metód,
+    \item zobrazenie tabuliek, grafov a wordcloudov,
+    \item export výsledkov.
+\end{itemize}
+
+Integrovaný mechanizmus \texttt{session\_state} slúži ako cache, ktorá eliminuje opakované výpočty pri nezmenených parametroch.
+
+Aplikácia je vďaka svojmu návrhu rozšíriteľná a vhodná na experimentálne porovnávanie rôznych metód extrakcie kľúčových slov.
+
+\begin{table}[H]
     \centering
+    \begin{tabular}{|c|c|p{8cm}|}
+    \hline
+    Metóda & Hyperparameter & Popis a vplyv \\
+    \hline
+    TF-IDF & max\_features & Maximálny počet slov zahrnutých do vektora. Obmedzuje rozmernosť vektora a vplýva na to, koľko informácií sa zachytí. \\
+    \hline
+    TF-IDF & ngram\_range & Rozsah n-gramov (napr. (1,2) = unigrams + bigrams). Určuje, či sa berú do úvahy jednotlivé slová alebo aj kombinácie slov. \\
+    \hline
+    TF-IDF & stop\_words & Stop slová, ktoré sa majú ignorovať. Odstraňuje bežné slová, ktoré neprispievajú k významu textu. \\
+    \hline
+    YAKE & window\_size & Kontextové okno pre hodnotenie slov. Väčšie okno zachytáva širšie súvislosti. \\
+    \hline
+    YAKE & top\_k & Počet najlepších kľúčových slov, ktoré sa vyberú. Ovláda množstvo extrahovaných kľúčových slov. \\
+    \hline
+    KeyBERT & use\_maxsum & Minimalizuje duplicity medzi vybranými kľúčovými slovami, zvyšuje rozmanitosť extrahovaných kľúčových slov. \\
+    \hline
+    KeyBERT & nr\_candidates & Počet kandidátov na výber. Viac kandidátov môže zvýšiť kvalitu extrahovaných kľúčových slov, ale spomalí spracovanie. \\
+    \hline
+    \end{tabular}
+    \caption{Prehľad hlavných hyperparametrov použitých pri extrakcii kľúčových slov.}
+    \label{tab:hyperparameters}
+\end{table}
+
+
+\section{Experimentovanie a vyhodnotenie}
+
+\begin{figure}[H]
+    \centering
+    % TF-IDF
     \begin{subfigure}[b]{0.45\textwidth}
         \includegraphics[width=\textwidth]{../images/tfidf_table.png}
         \caption{Tabuľka kľúčových slov TF-IDF}
-        \label{fig:tfidf_table}
     \end{subfigure}
     \hfill
     \begin{subfigure}[b]{0.45\textwidth}
         \includegraphics[width=\textwidth]{../images/tfidf_barh.png}
         \caption{Barh graf TF-IDF}
-        \label{fig:tfidf_barh}
     \end{subfigure}
 
     \vspace{0.5cm}
-
     \includegraphics[width=0.6\textwidth]{../images/tfidf_wordcloud.png}
     \caption{Výsledok extrakcie kľúčových slov metódou TF-IDF}
-    \label{fig:tfidf}
 \end{figure}
 
-
-% \subsection{YAKE}
-
-\begin{figure}[htbp]
+\begin{figure}[H]
     \centering
-    \begin{subfigure}{0.45\textwidth}
+    % YAKE
+    \begin{subfigure}[b]{0.45\textwidth}
         \includegraphics[width=\textwidth]{../images/yake_table.png}
         \caption{Tabuľka kľúčových slov YAKE}
     \end{subfigure}
     \hfill
-    \begin{subfigure}{0.45\textwidth}
+    \begin{subfigure}[b]{0.45\textwidth}
         \includegraphics[width=\textwidth]{../images/yake_barh.png}
         \caption{Barh graf YAKE}
     \end{subfigure}
 
     \vspace{0.5cm}
-
     \includegraphics[width=0.6\textwidth]{../images/yake_wordcloud.png}
     \caption{Výsledok extrakcie kľúčových slov metódou YAKE}
-    \label{fig:yake}
 \end{figure}
 
-% \subsection{KeyBERT}
-
-\begin{figure}[htbp]
+\begin{figure}[H]
     \centering
-    \begin{subfigure}{0.45\textwidth}
+    % KeyBERT
+    \begin{subfigure}[b]{0.45\textwidth}
         \includegraphics[width=\textwidth]{../images/keybert_table.png}
         \caption{Tabuľka kľúčových slov KeyBERT}
     \end{subfigure}
     \hfill
-    \begin{subfigure}{0.45\textwidth}
+    \begin{subfigure}[b]{0.45\textwidth}
         \includegraphics[width=\textwidth]{../images/keybert_barh.png}
         \caption{Barh graf KeyBERT}
     \end{subfigure}
 
     \vspace{0.5cm}
-
     \includegraphics[width=0.6\textwidth]{../images/keybert_wordcloud.png}
     \caption{Výsledok extrakcie kľúčových slov metódou KeyBERT}
-    \label{fig:keybert}
 \end{figure}
 
 \subsection{Zhrnutie experimentov}
@@ -213,8 +310,6 @@ Hlavné parametre testované počas experimentov boli:
 
 \noindent
 Kombinácia týchto metód poskytuje robustný nástroj na extrakciu kľúčových slov a umožňuje prispôsobiť parametre podľa typu a dĺžky dokumentu.
-
-% BIBLIOGRAFIA
 
 \clearpage
 \printbibliography[heading=bibnumbered]
