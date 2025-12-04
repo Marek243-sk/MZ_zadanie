@@ -20,6 +20,7 @@ class TFIDFConfig:
     ngram_range: Tuple[int, int] = (1, 2)
 
 
+# TF-IDF KWs extraction function
 def extract_tfidf(
     docs,
     config: TFIDFConfig,
@@ -32,7 +33,7 @@ def extract_tfidf(
         config (TFIDFConfig): Configuration object for TF-IDF extraction.
 
     Returns:
-        pd.DataFrame: DataFrame containing keywords and their TF-IDF scores.
+        pd.DataFrame: DataFrame with extracted keywords, scores and doc name.
     """
 
     # Convert a collection of raw documents to a matrix of TF-IDF features
@@ -58,10 +59,13 @@ def extract_tfidf(
     top_indices = tfidf_sorting[: config.top_n]
     keywords = [(feature_array[i], tfidf_scores[i]) for i in top_indices]
 
+    # Conwert results to DataFrame
     return (
         pd.DataFrame(keywords, columns=COLUMNS)
         .sort_values(by="Score", ascending=False)
         .reset_index(drop=True)
+        .assign(ID=lambda df: df.index + 1)
+        .set_index("ID")
     )
 
 
@@ -80,6 +84,7 @@ class YAKEConfig:
 
 # pylint: disable=too-many-arguments
 # pylint: disable=too-many-positional-arguments
+# YAKE KWs extraction function
 def extract_yake(text: str, config: YAKEConfig) -> pd.DataFrame:
     """
     Extract keywords from a text using the YAKE algorithm.
@@ -89,7 +94,7 @@ def extract_yake(text: str, config: YAKEConfig) -> pd.DataFrame:
         config (YAKEConfig): Configuration object for YAKE extraction.
 
     Returns:
-        pd.DataFrame: DataFrame with extracted keywords and scores.
+        pd.DataFrame: DataFrame with extracted keywords, scores and doc name.
     """
 
     # Initialize YAKE keyword extractor
@@ -110,6 +115,8 @@ def extract_yake(text: str, config: YAKEConfig) -> pd.DataFrame:
         pd.DataFrame(keywords, columns=COLUMNS)
         .sort_values(by="Score", ascending=False)
         .reset_index(drop=True)
+        .assign(ID=lambda df: df.index + 1)
+        .set_index("ID")
     )
 
 
@@ -124,6 +131,7 @@ class KEYBERTConfig:
     model_name: str = "all-MiniLM-L6-v2"
 
 
+# KeyBERT KWs extraction function
 def extract_keybert(
     text,
     config: KEYBERTConfig,
@@ -136,18 +144,21 @@ def extract_keybert(
         config (KEYBERTConfig): Configuration object for YAKE extraction.
 
     Returns:
-        pd.DataFrame: DataFrame with extracted keywords and scores.
+        pd.DataFrame: DataFrame with extracted keywords, scores and doc name.
     """
 
+    # Initialize chosen model
     kw_model = KeyBERT(config.model_name)
+
+    # Whether to use Maximal Marginal Relevance (MMR) for the selection of keywords/keyphrases
     if config.use_mmr:
         keywords = kw_model.extract_keywords(
             text,
             keyphrase_ngram_range=config.keyphrase_ngram_range,
             stop_words="english",
+            top_n=config.top_n,
             use_mmr=True,
             diversity=config.diversity,
-            top_n=config.top_n,
         )
     else:
         keywords = kw_model.extract_keywords(
@@ -156,8 +167,12 @@ def extract_keybert(
             stop_words="english",
             top_n=config.top_n,
         )
+
+    # Convert results to DataFrame
     return (
         pd.DataFrame(keywords, columns=COLUMNS)
         .sort_values(by="Score", ascending=False)
         .reset_index(drop=True)
+        .assign(ID=lambda df: df.index + 1)
+        .set_index("ID")
     )

@@ -2,7 +2,7 @@
 Module with functions to visualize model results
 """
 
-from typing import Optional, Tuple
+from typing import Tuple
 import pandas as pd
 import matplotlib.pyplot as plt
 from wordcloud import WordCloud
@@ -26,14 +26,14 @@ def plot_wordcloud(keywords: pd.DataFrame, width: int = 800, height: int = 400) 
 
 def plot_barh_chart(
     keywords: pd.DataFrame,
-    figsize: Optional[Tuple[int, int]] = (6, 4),
+    figsize: Tuple[int, int] = (6, 4),
     ascending: bool = True,
 ) -> None:
     """
     Function that creates barh chart
     Args:
         keywords(pd.DataFrame): dataframe with extracted kw, theirs score and origin
-        figsize(Optional[Tuple[int, int]]): size of the chart
+        figsize(Tuple[int, int]): size of the chart
         ascending(bool): scores ordering
     Returns:
         None

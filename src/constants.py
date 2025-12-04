@@ -3,13 +3,13 @@ Module with constants
 """
 
 LANGUAGE = "en"
-# STOPWORDS = "english"
 STOPWORDS = [
     "a", "the", "and", "but", "or", "so", "to", "of", "this", "that", "them",
     "than", "in", "up", "for", "as", "et", "al", "is", "by", "on", "are", "am"
     "I", "you", "we", "tey", "he", "she", "it", "their", "theirs", "et", "al",
     "use", "uses", "using", "an", "from", "with", "be", "not", "our", "used", "can",
-    "could", "would", "will", "were", "was"
+    "could", "would", "will", "were", "was", "yes", "no", "also", "how", "these",
+    "at"
     ]
 METHODS = ["TF-IDF", "YAKE", "KeyBERT"]
 MIN_VAL = 1
