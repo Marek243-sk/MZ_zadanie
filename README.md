@@ -31,6 +31,12 @@ src
  ┣ preprocessing.py
  ┣ utils.py
  ┗ visualization.py
+ tests
+ ┣ samples
+ ┃ ┗ sample_pdf.pdf
+ ┣ test_loaders.py
+ ┣ test_preprocessing.py
+ ┗ test_utils.py
  .gitignore
  README.md
 ```
@@ -46,6 +52,9 @@ yake
 keybert
 PyMuPDF
 unidecode
+black
+pylint
+pytest
 ```
 
 ### Setup instructions   
