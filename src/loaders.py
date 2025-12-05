@@ -38,17 +38,25 @@ def read_txt(file):
     Returns:
         text(str): extracted text data from given file
     """
+    # if file is bytes
     if isinstance(file, bytes):
         text = file.decode("utf-8")
+    #if file is string (path)
     elif isinstance(file, str):
         with open(file, "r", encoding="utf-8") as f:
             text = f.read()
+    # file is file-like object
     else:
-        text = file.read().decode("utf-8")
+        text = file.read()
+        # decode if it is bytes
+        if isinstance(text, bytes):
+            text = text.decode("utf-8")
 
+    # remove latex commands
     text = re.sub(r"\\(begin|end)\{.*?\}", " ", text)
-    text = re.sub(r"\\[a-zA-Z]+\{.*?\}", " ", text)
-    text = re.sub(r"\\[a-zA-Z]+", " ", text)
+    text = re.sub(r"\\[a-zA-Z]+\{(.*?)\}", r"\1", text)
+    text = re.sub(r"\\[a-zA-Z]+\s*", " ", text)
+
 
     text = re.sub(r"[^a-zA-ZáéíóúäčďľňôŕšťžÁÉÍÓÚÄČĎĽŇÔŔŠŤŽ\s]", " ", text)
 
